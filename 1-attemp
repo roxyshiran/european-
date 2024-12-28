@@ -1,0 +1,91 @@
+pip install pandas numpy matplotlib seaborn scikit-learn
+git clone https://github.com/your-username/PA_SB_Sleep_Analysis.git
+cd PA_SB_Sleep_Analysis
+git clone https://github.com/your-username/PA_SB_Sleep_Analysis.git
+cd PA_SB_Sleep_Analysis
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the data
+def load_data(file_path):
+    """
+    Load the 24-hour diary dataset.
+    :param file_path: Path to the CSV file.
+    :return: DataFrame containing the data.
+    """
+    try:
+        data = pd.read_csv(file_path)
+        print("Data loaded successfully.")
+        return data
+    except FileNotFoundError:
+        print("File not found. Please check the file path.")
+        return None
+
+# Data cleaning
+def clean_data(data):
+    """
+    Perform basic cleaning on the dataset.
+    :param data: Original DataFrame.
+    :return: Cleaned DataFrame.
+    """
+    # Handle missing values
+    data = data.dropna()
+    print("Missing values handled.")
+    return data
+
+# Descriptive statistics
+def analyze_data(data):
+    """
+    Analyze trends in PA, SB, and sleep.
+    :param data: Cleaned DataFrame.
+    """
+    print("\nSummary statistics:")
+    print(data.describe())
+
+    # Group data by country and calculate mean
+    country_summary = data.groupby('Country')[['PA', 'SB', 'Sleep']].mean()
+    print("\nCountry-wise average:")
+    print(country_summary)
+
+    return country_summary
+
+# Visualize trends
+def visualize_trends(data, country_summary):
+    """
+    Visualize trends and correlations.
+    :param data: Original DataFrame.
+    :param country_summary: Summary data for visualization.
+    """
+    # Plotting country-level averages
+    country_summary.plot(kind='bar', figsize=(12, 6))
+    plt.title('Average PA, SB, and Sleep by Country')
+    plt.ylabel('Hours')
+    plt.xlabel('Country')
+    plt.show()
+
+    # Correlation heatmap
+    correlations = data[['PA', 'SB', 'Sleep']].corr()
+    sns.heatmap(correlations, annot=True, cmap='coolwarm')
+    plt.title('Correlation between PA, SB, and Sleep')
+    plt.show()
+
+# Main function
+def main():
+    # File path to the dataset
+    file_path = "diary_data.csv"
+
+    # Load, clean, and analyze the data
+    data = load_data(file_path)
+    if data is not None:
+        data = clean_data(data)
+        country_summary = analyze_data(data)
+        visualize_trends(data, country_summary)
+
+if __name__ == "__main__":
+    main()
+python analyze_diaries.py
+git add analyze_diaries.py
+git commit -m "Initial script for analyzing 24-hour diary data"
+git push origin main
