@@ -1,0 +1,90 @@
+# Load and explore the dataset
+import pandas as pd
+data = pd.read_csv("your_dataset.csv")  # Replace with your file
+
+# Display the structure of the dataset
+print(data.info())
+print(data.describe())
+
+# Check for missing values
+print(data.isnull().sum())
+
+# Preview the first few rows
+print(data.head())
+# Fill missing values or drop rows with NaNs
+data = data.dropna()
+
+# Normalize numeric columns (optional)
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+data[['Physical_Activity', 'Sedentary_Behavior', 'Sleep_Hours']] = scaler.fit_transform(
+    data[['Physical_Activity', 'Sedentary_Behavior', 'Sleep_Hours']]
+)
+
+# Re-check dataset
+print(data.info())
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Scatterplot for activity vs sedentary behavior
+sns.scatterplot(data=data, x="Physical_Activity", y="Sedentary_Behavior", hue="Country")
+plt.title("Physical Activity vs Sedentary Behavior")
+plt.show()
+
+# Boxplot for sleep by age group
+sns.boxplot(data=data, x="Age", y="Sleep_Hours")
+plt.title("Sleep Patterns Across Age Groups")
+plt.show()
+
+# Correlation heatmap
+correlation = data.corr()
+sns.heatmap(correlation, annot=True, cmap="coolwarm")
+plt.title("Correlation Matrix")
+plt.show()
+# Group by age and country to calculate averages
+grouped = data.groupby(['Country', 'Age']).mean().reset_index()
+
+# Visualize country-level trends
+sns.barplot(data=grouped, x="Country", y="Physical_Activity", hue="Age")
+plt.title("Physical Activity Across Countries and Age Groups")
+plt.show()
+from sklearn.cluster import KMeans
+
+# Select features for clustering
+features = data[['Physical_Activity', 'Sedentary_Behavior', 'Sleep_Hours']]
+
+# Apply KMeans clustering
+kmeans = KMeans(n_clusters=4, random_state=42)
+data['Cluster'] = kmeans.fit_predict(features)
+
+# Visualize clusters
+sns.scatterplot(data=data, x="Physical_Activity", y="Sedentary_Behavior", hue="Cluster")
+plt.title("Clustering Analysis")
+plt.show()
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+# Define features and target
+X = data[['Physical_Activity', 'Sedentary_Behavior']]
+y = data['Sleep_Hours']
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluate the model
+print("Model Coefficients:", model.coef_)
+print("Model Intercept:", model.intercept_)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Scatterplot of actual vs predicted values
+sns.scatterplot(x=y_test, y=y_pred)
+plt.title("Actual vs Predicted Sleep Hours")
+plt.xlabel("Actual")
+plt.ylabel("Predicted")
+plt.show()
